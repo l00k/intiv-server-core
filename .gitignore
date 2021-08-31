@@ -1,0 +1,6 @@
+/.db-data
+/node_modules
+/var
+
+/.env
+/package-lock.json
