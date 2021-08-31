@@ -1,5 +1,5 @@
-import { ObjectManager } from '@100k/intiv/ObjectManager';
-import { isArrowFunction } from '@100k/intiv/Utility';
+import { ObjectManager } from 'intiv/utils/ObjectManager';
+import { isArrowFunction } from 'intiv/utils/Utility';
 
 
 type Callback = (data : any, previousResult : any) => any;

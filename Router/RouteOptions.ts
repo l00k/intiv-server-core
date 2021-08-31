@@ -1,4 +1,4 @@
-import { Initializable } from '@100k/intiv/Initializable';
+import { Initializable } from 'intiv/utils/Initializable';
 
 
 type Arguments = {

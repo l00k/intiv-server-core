@@ -1,5 +1,5 @@
-import { Configuration } from '@100k/intiv/Configuration';
-import { Inject, ReleaseSymbol } from '@100k/intiv/ObjectManager';
+import { Configuration } from 'intiv/utils/Configuration';
+import { Inject, ReleaseSymbol } from 'intiv/utils/ObjectManager';
 import { MikroORM, Options } from '@mikro-orm/core';
 
 

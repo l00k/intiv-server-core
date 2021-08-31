@@ -1,8 +1,8 @@
-import { Configuration } from '@100k/intiv/Configuration';
-import { EventBus } from '@100k/intiv/EventBus';
-import { Inject } from '@100k/intiv/ObjectManager';
-import ModuleLoader from 'core/Loader/ModuleLoader';
-import ServiceLoader from 'core/Loader/ServiceLoader';
+import { Configuration } from 'intiv/utils/Configuration';
+import { EventBus } from 'intiv/utils/EventBus';
+import { Inject } from 'intiv/utils/ObjectManager';
+import ModuleLoader from 'intiv/core/Loader/ModuleLoader';
+import ServiceLoader from 'intiv/core/Loader/ServiceLoader';
 
 
 export default abstract class AbstractApp

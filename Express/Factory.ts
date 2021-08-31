@@ -1,11 +1,11 @@
-import { Configuration } from '@100k/intiv/Configuration';
-import { EventBus } from '@100k/intiv/EventBus';
-import { Inject } from '@100k/intiv/ObjectManager';
+import { Configuration } from 'intiv/utils/Configuration';
+import { EventBus } from 'intiv/utils/EventBus';
+import { Inject } from 'intiv/utils/ObjectManager';
 import { MikroORM } from '@mikro-orm/core';
 import bodyParser from 'body-parser';
-import { Context } from 'core/GraphQL';
-import ModuleLoader from 'core/Loader/ModuleLoader';
-import AbstractResolver from 'core/Module/AbstractResolver';
+import { Context } from 'intiv/core/GraphQL';
+import ModuleLoader from 'intiv/core/Loader/ModuleLoader';
+import AbstractResolver from 'intiv/core/Module/AbstractResolver';
 import cors from 'cors';
 import express from 'express';
 import { graphqlHTTP } from 'express-graphql';

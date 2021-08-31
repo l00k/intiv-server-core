@@ -1,4 +1,4 @@
-import { Route as RouteInfo, RouteOptions } from 'core/Router';
+import { Route as RouteInfo, RouteOptions } from 'intiv/core/Router';
 
 
 export default function Route(path : string, options ? : RouteOptions)

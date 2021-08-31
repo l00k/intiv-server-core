@@ -1,6 +1,6 @@
 import { EntityManager } from '@mikro-orm/core';
 import * as ORM from '@mikro-orm/core';
-import { Exception } from 'core/Exception';
+import { Exception } from 'intiv/core/Exception';
 import * as GraphQL from 'type-graphql';
 
 

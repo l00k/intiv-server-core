@@ -1,9 +1,8 @@
 {
-    "name": "@app-server-base/core",
+    "name": "@l00k/intiv-server-core",
     "version": "0.0.1",
     "private": true,
     "dependencies": {
-        "@100k/intiv": "^0.8.0",
         "@100k/type-graphql-filter-mikroorm": "^0.2.2",
         "@mikro-orm/cli": "^4.5.4",
         "@mikro-orm/migrations": "^4.5.4",

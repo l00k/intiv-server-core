@@ -1,7 +1,7 @@
-import { EventBus } from '@100k/intiv/EventBus';
-import { ObjectManager, Inject } from '@100k/intiv/ObjectManager';
-import { ValidationException } from '@100k/intiv/Validator';
-import { Result, Controller } from 'core/Controller';
+import { EventBus } from 'intiv/utils/EventBus';
+import { ObjectManager, Inject } from 'intiv/utils/ObjectManager';
+import { ValidationException } from 'intiv/utils/Validator';
+import { Result, Controller } from 'intiv/core/Controller';
 import express from 'express';
 import { isEmpty } from 'lodash-es';
 import { Exception } from '../Exception';
