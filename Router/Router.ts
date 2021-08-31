@@ -1,15 +1,16 @@
+import express from 'express';
+import { Result, Controller } from 'intiv/core/Controller';
 import { EventBus } from 'intiv/utils/EventBus';
 import { ObjectManager, Inject } from 'intiv/utils/ObjectManager';
 import { ValidationException } from 'intiv/utils/Validator';
-import { Result, Controller } from 'intiv/core/Controller';
-import express from 'express';
 import { isEmpty } from 'lodash-es';
 import { Exception } from '../Exception';
 import Route from './Route';
 import RouteOptions from './RouteOptions';
 
-// deployment mode
+
 const env = process.env.NODE_ENV || 'production';
+
 
 type RouteDscr = {
     controller : Controller,
@@ -23,7 +24,7 @@ type RouteCallback = (
 ) => boolean;
 
 
-class Router
+export default class Router
 {
 
     protected controllers : Map<typeof Controller, Controller> = new Map();
@@ -136,7 +137,7 @@ class Router
 
                 response.send(msg);
 
-                console.error(`### Error 500\n${exception}`);
+                console.error(`### Error 500\n${ exception }`);
             }
         }
 
@@ -144,6 +145,3 @@ class Router
     }
 
 }
-
-
-export default Router;

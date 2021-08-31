@@ -1,14 +1,15 @@
-import { Initializable } from 'intiv/utils/Initializable';
+import { Initializable, RecursivePartial, Initialize } from 'intiv/utils/Initializable';
 
 
-class Result
+@Initialize()
+export default class Result
+    extends Initializable<Result>
 {
 
     private _code : number = 200;
 
     private _payload : any = null;
 
-    constructor(json : any = null) {}
 
     get code() : number
     {
@@ -31,6 +32,3 @@ class Result
     }
 
 }
-
-
-export default class extends Initializable(Result) {};

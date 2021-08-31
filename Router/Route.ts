@@ -1,8 +1,10 @@
-import { Initializable } from 'intiv/utils/Initializable';
+import { Initializable, Initialize } from 'intiv/utils/Initializable';
 import RouteOptions from './RouteOptions';
 
 
-class Route
+@Initialize()
+export default class Route
+    extends Initializable<Route>
 {
 
     public path : string = null;
@@ -12,6 +14,3 @@ class Route
     public options : RouteOptions = new RouteOptions();
 
 }
-
-
-export default class extends Initializable(Route) {};

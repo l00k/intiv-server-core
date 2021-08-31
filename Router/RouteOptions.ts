@@ -1,4 +1,4 @@
-import { Initializable } from 'intiv/utils/Initializable';
+import { Initializable, Initialize } from 'intiv/utils/Initializable';
 
 
 type Arguments = {
@@ -6,7 +6,9 @@ type Arguments = {
 };
 
 
-class RouteOptions
+@Initialize()
+export default class RouteOptions
+    extends Initializable<RouteOptions>
 {
 
     public method : string = 'GET';
@@ -14,5 +16,3 @@ class RouteOptions
     public arguments : Arguments = {};
 
 }
-
-export default class extends Initializable(RouteOptions) {};
