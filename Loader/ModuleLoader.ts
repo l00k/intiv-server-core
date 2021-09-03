@@ -3,14 +3,7 @@ import path from 'path';
 import glob from 'glob';
 
 
-type Callback = (data : any, previousResult : any) => any;
-
-type Listners = {
-    [eventName : string] : Callback[]
-};
-
-
-class ModuleLoader
+export default class ModuleLoader
 {
 
     public load<T>(types : string[]): T[]
@@ -28,7 +21,21 @@ class ModuleLoader
         return modules;
     }
 
+    public async loadFilePerModule(file : string)
+    {
+        const files : any = {};
+
+        const baseDir = global['__basedir'];
+        glob.sync(`modules/*/${file}`, { cwd: baseDir })
+            .forEach((path) => {
+                const pathParts = path.replace(/^[./]+/g, '').split('/');
+                pathParts.shift();
+                const moduleName = pathParts.shift();
+
+                files[moduleName] = require(path);
+            });
+
+        return files;
+    }
+
 }
-
-
-export default ModuleLoader;

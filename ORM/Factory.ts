@@ -1,29 +1,28 @@
-import { Configuration } from 'intiv/utils/Configuration';
-import { Inject, ReleaseSymbol } from 'intiv/utils/ObjectManager';
 import { MikroORM, Options } from '@mikro-orm/core';
+import { Config } from 'intiv/utils/Configuration';
+import { ReleaseSymbol } from 'intiv/utils/ObjectManager';
 
 
 export default class OrmFactory
 {
 
-    @Inject()
-    protected configuration : Configuration;
+    @Config('service.orm')
+    protected ormConfig : Options;
 
     public async create() : Promise<MikroORM>
     {
-        const config = this.configuration.get<Options>('services.orm');
-        const orm = await MikroORM.init(config);
+        const orm = await MikroORM.init(this.ormConfig);
 
         const migrator = orm.getMigrator();
         const migrations = await migrator.getPendingMigrations();
         if (migrations && migrations.length > 0) {
-            console.warn(`There are pending migrations! (${migrations.length})`);
+            console.warn(`There are pending migrations! (${ migrations.length })`);
         }
 
         // assign release procedure
-        orm[ReleaseSymbol] = async () => {
+        orm[ReleaseSymbol] = async() => {
             return await orm.close();
-        }
+        };
 
         return orm;
     }
