@@ -4,6 +4,8 @@ import { Inject, ObjectManager } from 'intiv/utils/ObjectManager';
 import ModuleLoader from 'intiv/core/Loader/ModuleLoader';
 import ServiceLoader from 'intiv/core/Loader/ServiceLoader';
 import _ from 'lodash';
+import * as fs from 'fs';
+import path from 'path';
 
 
 export default abstract class AbstractApp
@@ -54,9 +56,23 @@ export default abstract class AbstractApp
             });
 
         // global configuration
-        const configData = require('etc/config.ts').default;
-        configuration
-            .load(configData);
+        {
+            const configData = require('etc/config.ts').default;
+            configuration.load(configData);
+        }
+
+        // global deployment configuration
+        const deployment = process.env.NODE_ENV || 'development';
+        const baseDir = global['__basedir'];
+        const deploymentConfigPath = path.join(baseDir, `etc/deployment/${deployment}/config.ts`);
+        
+        const exists = fs.existsSync(deploymentConfigPath);
+        if (exists) {
+            const configData = require(`etc/deployment/${deployment}/config.ts`).default;
+            if (configData) {
+                configuration.load(configData);
+            }
+        }
     }
 
     protected abstract main();
