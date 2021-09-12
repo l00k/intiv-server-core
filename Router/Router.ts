@@ -36,8 +36,10 @@ export default class Router
 
     public registerRoute(controller : typeof Controller, route : Route)
     {
+        const objectManager = ObjectManager.getSingleton();
+    
         if (!this.controllers.has(controller)) {
-            const instance = ObjectManager.getInstance(controller);
+            const instance = objectManager.getInstance(controller);
             this.controllers.set(controller, instance);
         }
 
@@ -129,10 +131,10 @@ export default class Router
 
                 msg += env == 'development'
                     ? exception
-                    : 'Code: ' + exception.code;
+                    : 'Code: ' + (<any> exception).code;
 
                 if (env == 'development') {
-                    msg += '\n\n\n' + exception.stack;
+                    msg += '\n\n\n' + (<any> exception).stack;
                 }
 
                 response.send(msg);
