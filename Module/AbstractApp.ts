@@ -62,13 +62,12 @@ export default abstract class AbstractApp
         }
 
         // global deployment configuration
-        const deployment = process.env.NODE_ENV || 'development';
         const baseDir = global['__basedir'];
-        const deploymentConfigPath = path.join(baseDir, `etc/deployment/${deployment}/config.ts`);
+        const deploymentConfigPath = path.join(baseDir, `etc/local/config.ts`);
         
         const exists = fs.existsSync(deploymentConfigPath);
         if (exists) {
-            const configData = require(`etc/deployment/${deployment}/config.ts`).default;
+            const configData = require(deploymentConfigPath).default;
             if (configData) {
                 configuration.load(configData);
             }
