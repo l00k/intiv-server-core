@@ -20,9 +20,7 @@ export default class OrmFactory
         }
 
         // assign release procedure
-        orm[ReleaseSymbol] = async() => {
-            return await orm.close();
-        };
+        orm[ReleaseSymbol] = () => orm.close();
 
         return orm;
     }
