@@ -1,5 +1,5 @@
 import AbstractApp from 'intiv/core/Module/AbstractApp';
-import * as cli from 'classy-commander';
+import * as CLI from 'classy-commander';
 
 
 export default abstract class AbstractCliApp
@@ -10,7 +10,7 @@ export default abstract class AbstractCliApp
     {
         this.moduleLoader.load(['Command']);
         
-        await cli.execute();
+        await CLI.execute();
     }
     
 }
