@@ -1,9 +1,9 @@
-type ExceptionMetadata = {
+export type ExceptionMetadata = {
     responseCode : number,
 };
 
 
-class Exception extends Error
+export class Exception extends Error
 {
 
     public name : string = 'Exception';
@@ -31,9 +31,3 @@ class Exception extends Error
     }
 
 }
-
-
-export {
-    ExceptionMetadata,
-    Exception
-};
