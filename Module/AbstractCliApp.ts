@@ -9,7 +9,6 @@ export default abstract class AbstractCliApp
     protected async main ()
     {
         this.moduleLoader.load(['Command']);
-        
         await CLI.execute();
     }
     
