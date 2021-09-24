@@ -62,7 +62,7 @@ export default abstract class AbstractApp
         }
 
         // global deployment configuration
-        const baseDir = global['__basedir'];
+        const baseDir = globalThis['__basedir'];
         const deploymentConfigPath = path.join(baseDir, `etc/local/config.ts`);
         
         const exists = fs.existsSync(deploymentConfigPath);

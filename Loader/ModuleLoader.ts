@@ -9,7 +9,7 @@ export default class ModuleLoader
     public load<T>(types : string[]): T[]
     {
         const modules = [];
-        const baseDir = global['__basedir'];
+        const baseDir = globalThis['__basedir'];
 
         for (const type of types) {
             glob.sync(`modules/*/${type}/**/*.ts`, { cwd: baseDir })
@@ -25,7 +25,7 @@ export default class ModuleLoader
     {
         const files : any = {};
 
-        const baseDir = global['__basedir'];
+        const baseDir = globalThis['__basedir'];
         glob.sync(`modules/*/${file}`, { cwd: baseDir })
             .forEach((path) => {
                 const pathParts = path.replace(/^[./]+/g, '').split('/');
