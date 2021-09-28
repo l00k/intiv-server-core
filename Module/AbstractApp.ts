@@ -74,7 +74,7 @@ export default abstract class AbstractApp
         }
 
         // global on request run context configuration
-        const runContext = process.env.RUN_CONTEXTS;
+        const runContext = process.env.RUN_CONTEXT;
         if (runContext) {
             const baseDir = globalThis['__basedir'];
             const runContextConfigPath = path.join(baseDir, `etc/contexts/${runContext}/config.ts`);
