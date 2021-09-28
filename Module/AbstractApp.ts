@@ -6,19 +6,24 @@ import ServiceLoader from 'intiv/core/Loader/ServiceLoader';
 import _ from 'lodash';
 import * as fs from 'fs';
 import path from 'path';
+import { Logger } from 'intiv/utils/Utility';
 
 
 export default abstract class AbstractApp
 {
 
-    @Inject()
-    public eventBus : EventBus;
+    
+    @Inject({ ctorArgs: [ 'App' ] })
+    protected logger : Logger;
 
     @Inject()
-    public serviceLoader : ServiceLoader;
+    protected eventBus : EventBus;
 
     @Inject()
-    public moduleLoader : ModuleLoader;
+    protected serviceLoader : ServiceLoader;
+
+    @Inject()
+    protected moduleLoader : ModuleLoader;
 
 
     public async run()
@@ -67,6 +72,8 @@ export default abstract class AbstractApp
         
         const exists = fs.existsSync(deploymentConfigPath);
         if (exists) {
+            this.logger.log('Loading deployment configuration');
+        
             const configData = require(deploymentConfigPath).default;
             if (configData) {
                 configuration.load(configData);
@@ -81,6 +88,8 @@ export default abstract class AbstractApp
             
             const exists = fs.existsSync(runContextConfigPath);
             if (exists) {
+                this.logger.log('Loading run context configuration');
+                
                 const configData = require(runContextConfigPath).default;
                 if (configData) {
                     configuration.load(configData);
