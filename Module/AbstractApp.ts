@@ -72,6 +72,21 @@ export default abstract class AbstractApp
                 configuration.load(configData);
             }
         }
+
+        // global on request run context configuration
+        const runContext = process.env.RUN_CONTEXTS;
+        if (runContext) {
+            const baseDir = globalThis['__basedir'];
+            const runContextConfigPath = path.join(baseDir, `etc/contexts/${runContext}/config.ts`);
+            
+            const exists = fs.existsSync(runContextConfigPath);
+            if (exists) {
+                const configData = require(runContextConfigPath).default;
+                if (configData) {
+                    configuration.load(configData);
+                }
+            }
+        }
     }
 
     protected abstract main();
