@@ -1,25 +1,24 @@
 import * as ORM from '@mikro-orm/core';
-import Decimal from 'decimal.js';
 
 
 export default class DecimalType
-    extends ORM.Type<Decimal, string | null | undefined>
+    extends ORM.Type<number, string | null | undefined>
 {
-
-    public convertToDatabaseValue(value)
+    
+    public convertToDatabaseValue (value)
     {
         if (!value) {
             return '0';
         }
         return value.toString();
     }
-
-    public convertToJSValue(value)
+    
+    public convertToJSValue (value)
     {
         if (!value) {
-            return new Decimal(0);
+            return 0;
         }
-        return new Decimal(value);
+        return parseFloat(value);
     }
-
+    
 }

@@ -1,24 +1,16 @@
-import { EntityManager } from '@mikro-orm/core';
 import * as ORM from '@mikro-orm/core';
+import { EntityManager } from '@mikro-orm/core';
 import { Exception } from 'intiv/core/Exception';
 import * as GraphQL from 'type-graphql';
 
 
-export enum ApiResourceStatus
-{
-    New = 'new',
-    Fetching = 'fetching',
-    Ready = 'ready',
-}
-
-
 @GraphQL.ObjectType({ isAbstract: true })
-export default class AbstractModel<T extends { id: any }>
+export default class AbstractModel<T extends { id : any }>
     extends ORM.BaseEntity<T, 'id'>
 {
 
     @GraphQL.Field({ nullable: true })
-    public get _fullname (): string
+    public get _fullname() : string
     {
         throw new Exception('Undefined type');
     }
