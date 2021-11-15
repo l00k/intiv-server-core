@@ -24,7 +24,14 @@ export default abstract class AbstractApp
 
     @Inject()
     protected moduleLoader : ModuleLoader;
+    
+    protected exitCode : number = 0;
 
+
+    public getExitCode() : number
+    {
+        return this.exitCode;
+    }
 
     public async run()
     {
