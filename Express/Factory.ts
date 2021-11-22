@@ -1,5 +1,4 @@
 import { Configuration } from 'intiv/utils/Configuration';
-import { EventBus } from 'intiv/utils/EventBus';
 import { Inject } from 'intiv/utils/ObjectManager';
 import { MikroORM } from '@mikro-orm/core';
 import bodyParser from 'body-parser';
@@ -9,12 +8,12 @@ import AbstractResolver from 'intiv/core/Module/AbstractResolver';
 import cors from 'cors';
 import express from 'express';
 import { graphqlHTTP } from 'express-graphql';
-import * as fs from 'fs';
 import { GraphQLSchema } from 'graphql';
 import http from 'http';
-import https, { ServerOptions } from 'https';
+import { ServerOptions } from 'https';
 import { buildSchema } from 'type-graphql';
 import { Logger } from 'intiv/utils/Utility';
+import Router from 'intiv/core/Router';
 
 
 const env = process.env.NODE_ENV || 'production';
@@ -22,41 +21,47 @@ const isDev = env !== 'production';
 
 
 export type ExpressConfig = {
-    listenOnPort: number,
-    httpServerOptions?: ServerOptions,
+    listenOnPort : number,
+    httpServerOptions? : ServerOptions,
+    useNativeControllers? : boolean,
     useGraphQL? : boolean,
-    startGraphQLPlaygroundMiddleware?: boolean,
+    startGraphQLPlaygroundMiddleware? : boolean,
 }
 
 
 export default class ExpressFactory
 {
-
+    
     @Inject({ ctorArgs: [ ExpressFactory.name ] })
     protected logger : Logger;
-
+    
     @Inject()
     protected configuration : Configuration;
-
+    
     @Inject()
-    public moduleLoader : ModuleLoader;
-
+    protected moduleLoader : ModuleLoader;
+    
     @Inject()
-    public eventBus : EventBus;
-
+    protected router : Router;
+    
     @Inject({ name: 'orm' })
     protected orm : MikroORM;
-
-
-    public async create(config : ExpressConfig) : Promise<express.Application>
+    
+    
+    public async create (config : ExpressConfig) : Promise<express.Application>
     {
+        config = {
+            useNativeControllers: true,
+            ...config,
+        };
+    
         // create and configure express
         const expressServer = express();
-
+        
         expressServer.disable('x-powered-by');
         expressServer.set('trust proxy', 1);
         expressServer.use(cors());
-
+        
         const httpServerOptions = {
             ...(config.httpServerOptions || {})
         };
@@ -67,24 +72,29 @@ export default class ExpressFactory
             const expressPlayground = require('graphql-playground-middleware-express').default;
             expressServer.get('/graphql', expressPlayground({ endpoint: '/graphql' }));
         }
-
+        
         const promises = [];
+        
+        if (config.useNativeControllers) {
+            this.logger.log('Express - Router binding')
+            this.router.bindExpress(expressServer);
+        }
         
         if (config.useGraphQL) {
             const promise = new Promise(async(resolve, reject) => {
                 try {
                     const resolvers : any = this.moduleLoader.load<AbstractResolver>([ 'Resolver' ]);
-    
+                    
                     const schema : GraphQLSchema = await buildSchema({
                         resolvers: resolvers,
                         dateScalarMode: 'isoDate',
                         // emitSchemaFile: 'etc/schema.gql',
                     });
-    
+                    
                     expressServer.post(
                         '/graphql',
                         bodyParser.json(),
-                        graphqlHTTP(<any> ((request, response) => ({
+                        graphqlHTTP(<any>((request, response) => ({
                             schema,
                             context: {
                                 request,
@@ -93,7 +103,7 @@ export default class ExpressFactory
                             } as Context,
                         }))),
                     );
-    
+                    
                     expressServer.use((
                         error : Error,
                         req : express.Request,
@@ -109,10 +119,13 @@ export default class ExpressFactory
                     reject();
                 }
             });
+            
             promises.push(promise);
         }
         
-        await Promise.all(promises);
+        if (promises.length) {
+            await Promise.all(promises);
+        }
         
         httpServer.listen(config.listenOnPort, () => {
             this.logger.log(`Http server ready on port ${config.listenOnPort}...`);
@@ -120,5 +133,5 @@ export default class ExpressFactory
         
         return expressServer;
     }
-
+    
 }
