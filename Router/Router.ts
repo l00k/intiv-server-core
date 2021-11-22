@@ -1,12 +1,14 @@
 import express from 'express';
-import { Result, Controller } from 'intiv/core/Controller';
+import Controller from 'intiv/core/Module/AbstractController';
 import { EventBus } from 'intiv/utils/EventBus';
-import { ObjectManager, Inject } from 'intiv/utils/ObjectManager';
+import { Inject, ObjectManager } from 'intiv/utils/ObjectManager';
 import { ValidationException } from 'intiv/utils/Validator';
-import { isEmpty } from 'lodash-es';
 import { Exception } from '../Exception';
-import Route from './Route';
-import RouteOptions from './RouteOptions';
+import RouteInfo, { RouteOptions } from './RouteInfo';
+import { Logger } from 'intiv/utils/Utility';
+import ActionResult from 'intiv/core/Router/ActionResult';
+import { ClassConstructor } from 'intiv/utils/ObjectManager/def';
+import _ from 'lodash';
 
 
 const env = process.env.NODE_ENV || 'production';
@@ -26,33 +28,36 @@ type RouteCallback = (
 
 export default class Router
 {
-
-    protected controllers : Map<typeof Controller, Controller> = new Map();
-
-    protected routes : { [path : string] : RouteDscr } = {};
-
+    
+    @Inject({ ctorArgs: [ Router.name ] })
+    protected logger : Logger;
+    
     @Inject()
     protected eventBus : EventBus;
-
-    public registerRoute(controller : typeof Controller, route : Route)
+    
+    protected controllers : Map<any, Controller> = new Map();
+    protected routes : { [path : string] : RouteDscr } = {};
+    
+    
+    public registerRoute (CtrlClass : ClassConstructor<Controller>, route : RouteInfo)
     {
         const objectManager = ObjectManager.getSingleton();
-    
-        if (!this.controllers.has(controller)) {
-            const instance = objectManager.getInstance(controller);
-            this.controllers.set(controller, instance);
+        
+        if (!this.controllers.has(CtrlClass)) {
+            const instance = objectManager.getInstance(CtrlClass);
+            this.controllers.set(CtrlClass, instance);
         }
-
-        const instance = this.controllers.get(controller);
-
+        
+        const instance = this.controllers.get(CtrlClass);
+        
         this.routes[route.path] = {
             controller: instance,
-            action: route.action,
+            action: route.controllerMethod,
             options: route.options,
         };
     }
-
-    public bindExpress(express : express.Application)
+    
+    public bindExpress (express : express.Application)
     {
         for (let path in this.routes) {
             let routeDscr = this.routes[path];
@@ -62,33 +67,33 @@ export default class Router
             );
         }
     }
-
-    protected async handleRequest(
+    
+    protected async handleRequest (
         route : string,
         request : express.Request,
         response : express.Response
     )
     {
         const routeDscr = this.routes[route];
-
+        
         // collect parameters
         let parameters : {} = {};
-
+        
         if (!Object.values(request.params)) {
             Object.assign(parameters, request.params);
         }
-        if (!isEmpty(request?.query)) {
+        if (!_.isEmpty(request?.query)) {
             Object.assign(parameters, request.query);
         }
-
+        
         // handle route
         const controller : Controller = routeDscr.controller;
-
+        
         try {
             const result : any = await controller[routeDscr.action](parameters, request.body);
-
+            
             // prepared result
-            if (result instanceof Result) {
+            if (result instanceof ActionResult) {
                 response.status(result.code);
                 response.json(result.payload);
             }
@@ -100,7 +105,7 @@ export default class Router
         }
         catch (exception) {
             // prepared result
-            if (exception instanceof Result) {
+            if (exception instanceof ActionResult) {
                 response.status(exception.code);
                 response.json(exception.payload);
             }
@@ -126,24 +131,24 @@ export default class Router
             else {
                 response.contentType('text/plain');
                 response.status(500);
-
+                
                 let msg = 'Internal error!\n';
-
+                
                 msg += env == 'development'
                     ? exception
-                    : 'Code: ' + (<any> exception).code;
-
+                    : 'Code: ' + (<any>exception).code;
+                
                 if (env == 'development') {
-                    msg += '\n\n\n' + (<any> exception).stack;
+                    msg += '\n\n\n' + (<any>exception).stack;
                 }
-
+                
                 response.send(msg);
-
-                console.error(`### Error 500\n${ exception }`);
+                
+                this.logger.error(`### Error 500\n${exception}`);
             }
         }
-
+        
         response.end();
     }
-
+    
 }

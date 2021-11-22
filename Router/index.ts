@@ -1,10 +1,11 @@
-import Route from './Route';
-import RouteOptions from './RouteOptions';
+import { RouteMethod } from './def';
 import Router from './Router';
+import RouteInfo from './RouteInfo';
 
 
 export {
-    Route,
-    RouteOptions,
-    Router
+    RouteInfo,
+    RouteMethod,
 };
+
+export default Router;
