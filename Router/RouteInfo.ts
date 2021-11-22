@@ -1,9 +1,9 @@
 import { Initializable, Initialize } from 'intiv/utils/Initializable';
-import { RouteMethod } from 'intiv/core/Router/def';
+import { RequestMethod } from 'intiv/core/Router/def';
 
 
 export type RouteOptions = {
-    method : RouteMethod,
+    method : RequestMethod,
     arguments? : { [key: string]: any },
 }
 

@@ -1,7 +1,7 @@
 import express from 'express';
 import Controller from 'intiv/core/Module/AbstractController';
 import { EventBus } from 'intiv/utils/EventBus';
-import { Inject, ObjectManager } from 'intiv/utils/ObjectManager';
+import { Inject, ObjectManager, Singleton } from 'intiv/utils/ObjectManager';
 import { ValidationException } from 'intiv/utils/Validator';
 import { Exception } from '../Exception';
 import RouteInfo, { RouteOptions } from './RouteInfo';
@@ -26,6 +26,7 @@ type RouteCallback = (
 ) => boolean;
 
 
+@Singleton()
 export default class Router
 {
     
@@ -35,20 +36,24 @@ export default class Router
     @Inject()
     protected eventBus : EventBus;
     
-    protected controllers : Map<any, Controller> = new Map();
+    protected controllers : Map<typeof Controller, Controller> = new Map();
     protected routes : { [path : string] : RouteDscr } = {};
     
     
-    public registerRoute (CtrlClass : ClassConstructor<Controller>, route : RouteInfo)
+    public registerRoute (CtrlProto : typeof Controller, route : RouteInfo)
     {
+        this.logger.log('Route registered', route.options.method, route.path);
+        
         const objectManager = ObjectManager.getSingleton();
         
-        if (!this.controllers.has(CtrlClass)) {
-            const instance = objectManager.getInstance(CtrlClass);
-            this.controllers.set(CtrlClass, instance);
+        if (!this.controllers.has(CtrlProto)) {
+            const CtrlConstructor : ClassConstructor<Controller> = <any> CtrlProto.constructor;
+            const instance = objectManager.getInstance(CtrlConstructor);
+            
+            this.controllers.set(CtrlProto, instance);
         }
         
-        const instance = this.controllers.get(CtrlClass);
+        const instance = this.controllers.get(CtrlProto);
         
         this.routes[route.path] = {
             controller: instance,
@@ -59,9 +64,11 @@ export default class Router
     
     public bindExpress (express : express.Application)
     {
-        for (let path in this.routes) {
-            let routeDscr = this.routes[path];
-            express[routeDscr.options.method](
+        for (const path in this.routes) {
+            const routeDscr = this.routes[path];
+            const httpMethod = routeDscr.options.method.toLowerCase();
+            
+            express[httpMethod](
                 path,
                 async(request, response) => this.handleRequest(path, request, response)
             );

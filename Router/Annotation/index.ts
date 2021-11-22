@@ -1,20 +1,46 @@
 import RouteInfo, { RouteOptions } from 'intiv/core/Router/RouteInfo';
-import { RouteSymbol } from 'intiv/core/Router/def';
+import { ObjectManager } from 'intiv/utils/ObjectManager';
+import Router, { RequestMethod } from 'intiv/core/Router';
 
 
-export default function Route(path : string, options ? : RouteOptions)
+function Route (path : string, options ? : RouteOptions)
 {
     return (Target : any, method : string) => {
-        if (!Target[RouteSymbol]) {
-            Target[RouteSymbol] = [];
-        }
-
-        let route = new RouteInfo({
+        const router = ObjectManager.getSingleton()
+            .getInstance(Router);
+        
+        const routeInfo = new RouteInfo({
             path,
             controllerMethod: method,
-            options,
+            options: {
+                method: RequestMethod.GET,
+                ...options
+            },
         });
-
-        Target[RouteSymbol].push(route);
+        
+        router.registerRoute(Target, routeInfo);
     };
 }
+
+Route.GET = (path : string, options ? : RouteOptions) => {
+    return Route(path, { method: RequestMethod.GET, ...options });
+}
+
+Route.PUT = (path : string, options ? : RouteOptions) => {
+    return Route(path, { method: RequestMethod.PUT, ...options });
+}
+
+Route.POST = (path : string, options ? : RouteOptions) => {
+    return Route(path, { method: RequestMethod.POST, ...options });
+}
+
+Route.PATCH = (path : string, options ? : RouteOptions) => {
+    return Route(path, { method: RequestMethod.PATCH, ...options });
+}
+
+Route.DELETE = (path : string, options ? : RouteOptions) => {
+    return Route(path, { method: RequestMethod.DELETE, ...options });
+}
+
+
+export default Route;

@@ -1,7 +1,7 @@
 export const RouteSymbol = Symbol('Route');
 
 
-export enum RouteMethod
+export enum RequestMethod
 {
     GET = 'GET',
     PUT = 'PUT',
