@@ -43,4 +43,6 @@ Route.DELETE = (path : string, options ? : RouteOptions) => {
 }
 
 
-export default Route;
+export {
+    Route
+};
