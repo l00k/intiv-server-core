@@ -60,7 +60,10 @@ export default class ExpressFactory
         
         expressServer.disable('x-powered-by');
         expressServer.set('trust proxy', 1);
+        
         expressServer.use(cors());
+        expressServer.use(bodyParser.urlencoded({ extended: false }));
+        expressServer.use(bodyParser.json())
         
         const httpServerOptions = {
             ...(config.httpServerOptions || {})
@@ -93,7 +96,6 @@ export default class ExpressFactory
                     
                     expressServer.post(
                         '/graphql',
-                        bodyParser.json(),
                         graphqlHTTP(<any>((request, response) => ({
                             schema,
                             context: {

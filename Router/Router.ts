@@ -70,7 +70,7 @@ export default class Router
             
             express[httpMethod](
                 path,
-                async(request, response) => this.handleRequest(path, request, response)
+                (request, response) => this.handleRequest(path, request, response)
             );
         }
     }
@@ -99,12 +99,10 @@ export default class Router
         try {
             const result : any = await controller[routeDscr.action](parameters, request.body);
             
-            // prepared result
             if (result instanceof ActionResult) {
                 response.status(result.code);
                 response.json(result.payload);
             }
-            // inline json result
             else if (typeof result != 'undefined') {
                 response.status(200);
                 response.json(result);
