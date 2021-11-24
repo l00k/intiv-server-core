@@ -9,6 +9,7 @@ import { Logger } from 'intiv/utils/Utility';
 import ActionResult from 'intiv/core/Router/ActionResult';
 import { ClassConstructor } from 'intiv/utils/ObjectManager/def';
 import _ from 'lodash';
+import colors from 'colors';
 
 
 const env = process.env.NODE_ENV || 'production';
@@ -42,12 +43,13 @@ export default class Router
     
     public registerRoute (CtrlProto : typeof Controller, route : RouteInfo)
     {
-        this.logger.log('Route registered', route.options.method, route.path);
+        
+        this.logger.log('Route registered', colors.brightGreen(route.options.method), colors.brightCyan(route.path));
         
         const objectManager = ObjectManager.getSingleton();
         
         if (!this.controllers.has(CtrlProto)) {
-            const CtrlConstructor : ClassConstructor<Controller> = <any> CtrlProto.constructor;
+            const CtrlConstructor : ClassConstructor<Controller> = <any>CtrlProto.constructor;
             const instance = objectManager.getInstance(CtrlConstructor);
             
             this.controllers.set(CtrlProto, instance);

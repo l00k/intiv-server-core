@@ -6,7 +6,7 @@ import { Context } from 'intiv/core/GraphQL';
 import ModuleLoader from 'intiv/core/Loader/ModuleLoader';
 import AbstractResolver from 'intiv/core/Module/AbstractResolver';
 import cors from 'cors';
-import express from 'express';
+import express, { Request } from 'express';
 import { graphqlHTTP } from 'express-graphql';
 import { GraphQLSchema } from 'graphql';
 import http from 'http';
@@ -14,10 +14,7 @@ import { ServerOptions } from 'https';
 import { buildSchema } from 'type-graphql';
 import { Logger } from 'intiv/utils/Utility';
 import Router from 'intiv/core/Router';
-
-
-const env = process.env.NODE_ENV || 'production';
-const isDev = env !== 'production';
+import colors from 'colors';
 
 
 export type ExpressConfig = {
@@ -32,7 +29,7 @@ export type ExpressConfig = {
 export default class ExpressFactory
 {
     
-    @Inject({ ctorArgs: [ ExpressFactory.name ] })
+    @Inject({ ctorArgs: [ 'Express' ] })
     protected logger : Logger;
     
     @Inject()
@@ -54,7 +51,7 @@ export default class ExpressFactory
             useNativeControllers: true,
             ...config,
         };
-    
+        
         // create and configure express
         const expressServer = express();
         
@@ -63,7 +60,12 @@ export default class ExpressFactory
         
         expressServer.use(cors());
         expressServer.use(bodyParser.urlencoded({ extended: false }));
-        expressServer.use(bodyParser.json())
+        expressServer.use(bodyParser.json());
+        
+        expressServer.use((request : Request, resp, next) => {
+            this.logger.log('Incoming request', colors.brightGreen(request.method), colors.brightCyan(request.path));
+            next();
+        });
         
         const httpServerOptions = {
             ...(config.httpServerOptions || {})
@@ -71,7 +73,7 @@ export default class ExpressFactory
         const httpServer = http.createServer(httpServerOptions, expressServer);
         
         // playground
-        if (isDev) {
+        if (config.startGraphQLPlaygroundMiddleware) {
             const expressPlayground = require('graphql-playground-middleware-express').default;
             expressServer.get('/graphql', expressPlayground({ endpoint: '/graphql' }));
         }
@@ -79,7 +81,7 @@ export default class ExpressFactory
         const promises = [];
         
         if (config.useNativeControllers) {
-            this.logger.log('Express - Router binding')
+            this.logger.log('Express - Router binding');
             this.router.bindExpress(expressServer);
         }
         
