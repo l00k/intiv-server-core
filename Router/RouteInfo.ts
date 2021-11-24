@@ -4,7 +4,7 @@ import express from 'express';
 
 
 export type RouteOptions = {
-    method : RequestMethod,
+    method? : RequestMethod,
     arguments? : { [key: string]: any },
     middlewares? : express.RequestHandler[],
 }
