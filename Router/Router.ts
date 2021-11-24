@@ -43,8 +43,6 @@ export default class Router
     
     public registerRoute (CtrlProto : typeof Controller, route : RouteInfo)
     {
-        this.logger.log('Route registered', colors.brightGreen(route.options.method), colors.brightCyan(route.path));
-        
         const objectManager = ObjectManager.getSingleton();
         
         if (!this.controllers.has(CtrlProto)) {
@@ -75,6 +73,8 @@ export default class Router
                 ...middlewares,
                 (request, response) => this.handleRequest(path, request, response)
             );
+            
+            this.logger.log('Route registered', colors.brightGreen(routeDscr.options.method), colors.brightCyan(path));
         }
     }
     
