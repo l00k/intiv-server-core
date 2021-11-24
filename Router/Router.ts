@@ -43,7 +43,6 @@ export default class Router
     
     public registerRoute (CtrlProto : typeof Controller, route : RouteInfo)
     {
-        
         this.logger.log('Route registered', colors.brightGreen(route.options.method), colors.brightCyan(route.path));
         
         const objectManager = ObjectManager.getSingleton();
@@ -69,9 +68,11 @@ export default class Router
         for (const path in this.routes) {
             const routeDscr = this.routes[path];
             const httpMethod = routeDscr.options.method.toLowerCase();
+            const middlewares = routeDscr.options.middlewares || [];
             
             express[httpMethod](
                 path,
+                ...middlewares,
                 (request, response) => this.handleRequest(path, request, response)
             );
         }
