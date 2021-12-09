@@ -58,14 +58,15 @@ export default abstract class AbstractApp
         const configuration = Configuration.getSingleton();
 
         // per module configuration
+        const modules = await this.moduleLoader.loadModules();
         const moduleConfigPackages = await this.moduleLoader.loadFilePerModule('etc/config.ts');
 
-        Object.entries(moduleConfigPackages)
-            .forEach(([moduleName, moduleConfigPackage]) => {
-                const moduleCode = _.camelCase(moduleName);
-                const configData = (<any>moduleConfigPackage).default;
-                configuration.load(configData, `module.${moduleCode}`);
-            });
+        for (const moduleName in modules) {
+            const moduleConfigPackage = moduleConfigPackages[moduleName];
+            if (moduleConfigPackage) {
+                configuration.load(moduleConfigPackage.default);
+            }
+        }
 
         // global configuration
         {
