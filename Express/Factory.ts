@@ -78,57 +78,43 @@ export default class ExpressFactory
             expressServer.get('/graphql', expressPlayground({ endpoint: '/graphql' }));
         }
         
-        const promises = [];
-        
         if (config.useNativeControllers) {
             this.logger.log('Express - Router binding');
             this.router.bindExpress(expressServer);
         }
         
         if (config.useGraphQL) {
-            const promise = new Promise(async(resolve, reject) => {
-                try {
-                    const resolvers : any = this.moduleLoader.load<AbstractResolver>([ 'Resolver' ]);
-                    
-                    const schema : GraphQLSchema = await buildSchema({
-                        resolvers: resolvers,
-                        dateScalarMode: 'isoDate',
-                        // emitSchemaFile: 'etc/schema.gql',
-                    });
-                    
-                    expressServer.post(
-                        '/graphql',
-                        graphqlHTTP(<any>((request, response) => ({
-                            schema,
-                            context: {
-                                request,
-                                response,
-                                entityManager: this.orm.em.fork()
-                            } as Context,
-                        }))),
-                    );
-                    
-                    expressServer.use((
-                        error : Error,
-                        req : express.Request,
-                        res : express.Response,
-                        next : express.NextFunction
-                    ) => {
-                        this.logger.error('Something went wrong', error);
-                        res.status(400).send(error);
-                    });
-                }
-                catch (error) {
-                    this.logger.error('Could not start server', error);
-                    reject();
-                }
+            this.logger.log('Express - GrapQL binding');
+            
+            const resolvers : any = this.moduleLoader.load<AbstractResolver>([ 'Resolver' ]);
+            
+            const schema : GraphQLSchema = await buildSchema({
+                resolvers: resolvers,
+                dateScalarMode: 'isoDate',
+                emitSchemaFile: 'etc/schema.gql',
             });
             
-            promises.push(promise);
-        }
-        
-        if (promises.length) {
-            await Promise.all(promises);
+            expressServer.post(
+                '/graphql',
+                graphqlHTTP(<any>((request, response) => ({
+                    schema,
+                    context: {
+                        request,
+                        response,
+                        entityManager: this.orm.em.fork()
+                    } as Context,
+                }))),
+            );
+            
+            expressServer.use((
+                error : Error,
+                req : express.Request,
+                res : express.Response,
+                next : express.NextFunction
+            ) => {
+                this.logger.error('Something went wrong', error);
+                res.status(400).send(error);
+            });
         }
         
         httpServer.listen(config.listenOnPort, () => {
